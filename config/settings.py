@@ -133,3 +133,7 @@ LOGOUT_REDIRECT_URL = 'photo_list'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://felhoalapu-elosztott-rendszerek-laboratorium-django.apps.okd.fured.cloud.bme.hu',
+]
