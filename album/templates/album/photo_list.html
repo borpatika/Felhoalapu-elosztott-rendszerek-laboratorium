@@ -1,0 +1,26 @@
+{% extends "album/base.html" %}
+
+{% block content %}
+
+<h2>Fotók listája</h2>
+
+<p>
+    Rendezés:
+    <a href="?sort=name">Név szerint</a> |
+    <a href="?sort=date">Dátum szerint</a>
+</p>
+
+<ul>
+    {% for photo in photos %}
+        <li>
+            <a href="{% url 'photo_detail' photo.id %}">
+                {{ photo.name }}
+            </a>
+            - {{ photo.uploaded_at|date:"Y-m-d H:i" }}
+        </li>
+    {% empty %}
+        <li>Nincs még feltöltött kép.</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "album/base.html" %}
+
+{% block content %}
+<h2>Feltöltés</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Feltöltés</button>
+</form>
+
+<a href="{% url 'photo_list' %}">Vissza a listához</a>
+{% endblock %}

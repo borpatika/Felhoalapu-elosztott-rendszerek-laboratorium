@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fotoalbum</title>
+</head>
+<body>
+    <h1>Felhő alapú Fotoalbum</h1>
+
+    <p>
+        <a href="{% url 'photo_list' %}">Főoldal</a> |
+
+        {% if user.is_authenticated %}
+            Üdv, {{ user.username }} |
+            <a href="{% url 'my_photos' %}">Saját képeim</a> |
+            <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Kijelentkezés</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}">Bejelentkezés</a> |
+            <a href="{% url 'register' %}">Regisztráció</a>
+        {% endif %}
+    </p>
+
+    <hr>
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>

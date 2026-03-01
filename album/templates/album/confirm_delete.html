@@ -1,0 +1,13 @@
+{% extends "album/base.html" %}
+
+{% block content %}
+<h2>Kép törlése</h2>
+
+<p>Biztosan törölni szeretnéd a "{{ photo.name }}" képet?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Igen, törlés</button>
+    <a href="{% url 'my_photos' %}">Mégse</a>
+</form>
+{% endblock %}
