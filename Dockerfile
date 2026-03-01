@@ -20,5 +20,10 @@ ENV DJANGO_SETTINGS_MODULE=config.settings
 # Expose port
 EXPOSE 8080
 
-# Run the server
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Use entrypoint to run migrations before starting the server
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8080"]
