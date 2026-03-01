@@ -26,7 +26,11 @@ SECRET_KEY = 'django-insecure-tz!tp&@=gs+!(omi0q+)8_7t35n-6n-qu0jxp3=f$y54+03r_-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "felhoalapu-elosztott-rendszerek-laboratorium-django.apps.okd.fured.cloud.bme.hu",
+]
 
 
 # Application definition
