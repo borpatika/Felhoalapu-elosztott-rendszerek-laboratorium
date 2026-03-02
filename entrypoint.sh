@@ -1,13 +1,10 @@
 #!/bin/bash
 set -e
 
-# Ensure media directory exists and is writable
-mkdir -p /app/media
-chmod -R 777 /app/media
+mkdir -p /tmp/media  # itt működni fog
+chmod -R 777 /tmp/media
 
-# Run migrations
 echo "Running migrations..."
 python manage.py migrate --noinput
 
-# Execute CMD
 exec "$@"
