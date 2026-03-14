@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-mkdir -p /tmp/media  # itt működni fog
-chmod -R 777 /tmp/media
+mkdir -p /app/media
+chmod -R 777 /app/media
 
 echo "Running migrations..."
 python manage.py migrate --noinput
