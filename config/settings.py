@@ -80,8 +80,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join('/tmp', 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'album',
+        'USER': 'albumuser',
+        'PASSWORD': 'albumpass',
+        'HOST': 'postgres',
+        'PORT': '5432',
     }
 }
 
