@@ -205,3 +205,4 @@ Az első beadás keretében elkészült:
 - Konténerizált deploy OpenShift környezetben
 
 A második beadás során az architektúra továbbfejlesztése történik külön adatbázis-szerver és perzisztens tárolás bevezetésével.
+
