@@ -6,9 +6,12 @@
 
 <p>Feltöltve: {{ photo.uploaded_at|date:"Y-m-d H:i" }}</p>
 
-<img src="{{ photo.image.url }}" width="400">
+<div class="center-image">
+    <img src="{{ photo.image.url }}">
+</div>
 
-<br><br>
-<a href="{% url 'photo_list' %}">Vissza a listához</a>
+<br>
+
+<a class="btn" href="{% url 'photo_list' %}">← Vissza</a>
 
 {% endblock %}

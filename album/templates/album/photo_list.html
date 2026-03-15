@@ -2,25 +2,22 @@
 
 {% block content %}
 
-<h2>Fotók listája</h2>
+<h2>Fotók</h2>
 
-<p>
-    Rendezés:
-    <a href="?sort=name">Név szerint</a> |
-    <a href="?sort=date">Dátum szerint</a>
-</p>
-
-<ul>
+<div class="grid">
     {% for photo in photos %}
-        <li>
+        <div class="card">
             <a href="{% url 'photo_detail' photo.id %}">
-                {{ photo.name }}
+                <img src="{{ photo.image.url }}">
             </a>
-            - {{ photo.uploaded_at|date:"Y-m-d H:i" }}
-        </li>
+            <div class="card-body">
+                <strong>{{ photo.name }}</strong><br>
+                <small>{{ photo.uploaded_at|date:"Y-m-d" }}</small>
+            </div>
+        </div>
     {% empty %}
-        <li>Nincs még feltöltött kép.</li>
+        Nincs még kép.
     {% endfor %}
-</ul>
+</div>
 
 {% endblock %}

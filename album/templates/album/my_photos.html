@@ -3,17 +3,24 @@
 {% block content %}
 <h2>Saját képeim</h2>
 
-<ul>
-    {% for photo in photos %}
-        <li>
-            <a href="{% url 'photo_detail' photo.id %}">{{ photo.name }}</a>
-            - {{ photo.uploaded_at|date:"Y-m-d H:i" }}
-            <a href="{% url 'delete_photo' photo.id %}">Törlés</a>
-        </li>
-    {% empty %}
-        <li>Nincs még feltöltött kép.</li>
-    {% endfor %}
-</ul>
+<a class="btn" href="{% url 'upload_photo' %}">+ Feltöltés</a>
 
-<a href="{% url 'upload_photo' %}">Új kép feltöltése</a>
+<br><br>
+
+<div class="grid">
+    {% for photo in photos %}
+        <div class="card">
+            <a href="{% url 'photo_detail' photo.id %}">
+                <img src="{{ photo.image.url }}">
+            </a>
+            <div class="card-body">
+                {{ photo.name }}<br><br>
+                <a class="btn" href="{% url 'delete_photo' photo.id %}">Törlés</a>
+            </div>
+        </div>
+    {% empty %}
+        Nincs még feltöltött kép.
+    {% endfor %}
+</div>
+
 {% endblock %}

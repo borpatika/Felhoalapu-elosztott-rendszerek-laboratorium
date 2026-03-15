@@ -7,7 +7,8 @@
 
 <form method="post">
     {% csrf_token %}
-    <button type="submit">Igen, törlés</button>
-    <a href="{% url 'my_photos' %}">Mégse</a>
+    <button class="btn" type="submit">Igen, törlés</button>
+    <a class="btn" href="{% url 'my_photos' %}">Mégse</a>
 </form>
+
 {% endblock %}
