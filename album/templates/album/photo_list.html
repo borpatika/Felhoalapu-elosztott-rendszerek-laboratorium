@@ -4,6 +4,13 @@
 
 <h2>Fotók</h2>
 
+<div style="margin-bottom:20px;">
+    <span style="margin-right:10px;">Rendezés:</span>
+
+    <a class="btn" href="?sort=name">Név szerint</a>
+    <a class="btn" href="?sort=date">Dátum szerint</a>
+</div>
+
 <div class="grid">
     {% for photo in photos %}
         <div class="card">
@@ -12,7 +19,7 @@
             </a>
             <div class="card-body">
                 <strong>{{ photo.name }}</strong><br>
-                <small>{{ photo.uploaded_at|date:"Y-m-d" }}</small>
+                <small>{{ photo.uploaded_at|date:"Y-m-d H:i" }}</small>
             </div>
         </div>
     {% empty %}
