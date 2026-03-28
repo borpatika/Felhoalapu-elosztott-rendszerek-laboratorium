@@ -1,0 +1,14 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: locust
+  namespace: django
+spec:
+  host: locust-django.apps.okd.fured.cloud.bme.hu
+  to:
+    kind: Service
+    name: locust
+  port:
+    targetPort: 8089
+  tls:
+    termination: edge

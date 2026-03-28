@@ -1,5 +1,5 @@
 # Felhőalapú elosztott rendszerek laboratórium  
-## Fényképalbum alkalmazás – 1. beadás
+# Fényképalbum alkalmazás – 1. beadás
 
 ## Projekt célja
 
@@ -206,3 +206,82 @@ Az első beadás keretében elkészült:
 
 A második beadás során az architektúra továbbfejlesztése történik külön adatbázis-szerver és perzisztens tárolás bevezetésével.
 
+
+# Fényképalbum alkalmazás – 2. beadás
+
+### TODO: azt hittem megírtam, de nem.
+
+tldr: létrehoztam egy postgres deploymentet és service-t és külön adatbázis szerver fut a Django alkalmazása mellett és ehhez kapcsolódik az appom. Továbbá létrehoztam kettő PVC-t és hozzácsatoltam egyet-egyet a Django és postgres pod-hoz, így az esetleges újraindítások után se vesznek el az adatok, hanem perzisztensen megmaradnak.
+
+<br>
+
+# Fényképalbum alkalmazás – 3. beadás
+## Skálázódó Webalkalmazás Dokumentáció
+
+A feladat célja a fényképalbum alkalmazásszerverének automatikus skálázódásának bemutatása egy PaaS környezetben (OKD/OpenShift), valamint a skálázódás tesztelése terheléspróbával. Ehhez a Django alapú alkalmazást és a Locust terhelésgenerátort használtam.
+
+---
+
+## 2. Alkalmazás beállítása és skálázódás konfigurálása
+
+1. **Django Deployment módosítása**
+   - A konténer erőforrásait korlátoztam CPU és memória szempontjából, hogy a HPA kis terhelés esetén is indokolja a több pod elindítását.
+
+2. **HPA (Horizontal Pod Autoscaler) létrehozása**
+   - A Deployment-hez HPA-t konfiguráltam a minimum és maximum pod szám megadásával, valamint CPU-arány figyelésével.
+   - A HPA-t az OKD webes felületén hoztam létre.
+   - A beállított HPA biztosítja, hogy a CPU terhelés növekedése új podokat indít, és a terhelés csökkenésekor visszaskálázódik.
+
+---
+
+## 3. Terheléspróba elkészítése Locust-tal
+
+1. **Locust testfile létrehozása**
+   - A teszt lefedi a fényképalbum fő funkcióit: lista, részletezés, feltöltés.
+   - Teszt felhasználót hoztam létre a Django appban `testuser`/`testpassword` névvel.
+   - A szükséges tesztképet (`test.jpg`) is feltöltöttem a teszt konténerhez.
+
+2. **Dockerfile a Locust számára**  
+   - Létrehoztam egy Dockerfile-t, amely tartalmazza a Locust telepítését és a testfile-t.
+   - Az image build és deployment OpenShift CLI segítségével történt:
+     - `oc new-build` az új image létrehozására
+     - `oc start-build` az image felépítésére
+     - `oc apply -f <deployment>` a Locust Deployment létrehozására
+     - `oc expose svc/locust` a webes felület eléréséhez
+
+3. **Route létrehozása**  
+   - Első próbálkozásnál a HTTPS miatt a Locust webes UI nem volt elérhető.
+   - Hozzáadtam egy Route-ot a Locust szolgáltatáshoz, így a webes felület elérhetővé vált.
+
+---
+
+## 4. Locust Webes UI
+
+- A webes felületen beállítható a felhasználók száma, a ramp-up idő és a futtatási idő.
+- A teszt során például:
+  - 10 felhasználó a csúcsban
+  - Ramp-up: 1 user/sec
+  - Host: a Django alkalmazás elérési címe
+- Webes UI képernyőképe: ![alt text](image.png)
+
+---
+
+## 5. Automatikus skálázódás dokumentálása
+
+- A HPA monitorozása OpenShift CLI-vel (`oc get hpa`).
+- Terhelés alatt az alkalmazás több podra skálázódott (pl. 1 -> 4 pod).
+- Terhelés csökkenésével a podok visszaskálázódtak az eredeti számra (1 pod).
+### Skálázódás:
+- Terhelés előtt 1 pod fut: ![alt text](image-1.png)
+- Terhelés elindítása: ![alt text](image-2.png)
+- Terhelés közben 4 pod fut: ![alt text](image-3.png)
+- Terhelés leállta után visszaáll 1 pod-ra: ![alt text](image-4.png)
+---
+
+## 7. Tanulságok
+
+- **Autoscaling működik**: a HPA sikeresen skálázta a podokat a terhelés növekedésére és csökkenésére.
+- **Erőforrás-korlátok**: CPU/memória limit beállítás szükséges a kis terhelésű felskálázódáshoz.
+- **Terheléspróba PaaS-on**: a Locust webes UI lehetővé tette a teszt konfigurálását felhőből.
+
+---
