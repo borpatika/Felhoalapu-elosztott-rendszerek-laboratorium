@@ -6,8 +6,10 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Feltöltés</button>
+    <button class="btn" type="submit">Feltöltés</button>
 </form>
 
-<a href="{% url 'photo_list' %}">Vissza a listához</a>
+<br>
+<a class="btn" href="{% url 'photo_list' %}">Vissza</a>
+
 {% endblock %}

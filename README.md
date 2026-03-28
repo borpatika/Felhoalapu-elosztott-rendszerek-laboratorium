@@ -206,12 +206,116 @@ Az első beadás keretében elkészült:
 
 A második beadás során az architektúra továbbfejlesztése történik külön adatbázis-szerver és perzisztens tárolás bevezetésével.
 
+<br>
 
 # Fényképalbum alkalmazás – 2. beadás
 
-### TODO: azt hittem megírtam, de nem.
+# 2. beadás – Architektúra továbbfejlesztése
 
-tldr: létrehoztam egy postgres deploymentet és service-t és külön adatbázis szerver fut a Django alkalmazása mellett és ehhez kapcsolódik az appom. Továbbá létrehoztam kettő PVC-t és hozzácsatoltam egyet-egyet a Django és postgres pod-hoz, így az esetleges újraindítások után se vesznek el az adatok, hanem perzisztensen megmaradnak.
+A második beadás során az alkalmazás architektúrája továbbfejlesztésre került annak érdekében, hogy megfeleljen egy skálázható, többrétegű felhőalapú webalkalmazás követelményeinek.
+
+Az első beadásban alkalmazott konténeren belüli SQLite adatbázist egy külön PostgreSQL adatbázis-szerver váltotta fel, valamint bevezetésre került a perzisztens fájltárolás.
+
+---
+
+### Külső PostgreSQL adatbázis
+
+Az alkalmazás adatbázis rétege külön Kubernetes Deployment objektumban futó PostgreSQL szerverre lett szétválasztva.
+
+A PostgreSQL egy saját Service erőforráson keresztül érhető el a Django alkalmazás számára.  
+A kapcsolat a Kubernetes belső DNS rendszerén keresztül történik az alábbi paraméterekkel:
+
+- Host: `postgres`
+- Port: `5432`
+- Adatbázis neve: `album`
+
+A Django alkalmazás konfigurációja PostgreSQL backend használatára lett módosítva, így az alkalmazás és az adatbázis külön konténerben, külön erőforrásként működik.
+
+Ez a megoldás lehetővé teszi az alkalmazás réteg horizontális skálázását, valamint megfelel egy valós felhőalapú architektúra kialakításának.
+
+---
+
+### Perzisztens adatbázis tárolás
+
+A PostgreSQL Deployment egy PersistentVolumeClaim erőforrást használ, amely a konténer adatkönyvtárához (`/var/lib/pgsql/data`) van csatolva.
+
+Ennek eredményeként:
+
+- az adatbázis tartalma pod újraindítás után is megmarad  
+- deployment újragördítés esetén nem történik adatvesztés  
+- az adatbázis állapottartó komponensként működik  
+
+A PostgreSQL Deployment `Recreate` stratégiával lett konfigurálva annak érdekében, hogy új pod indítása előtt a régi pod leálljon, így a kötet biztonságosan újracsatolható legyen.
+
+---
+
+### Perzisztens média fájltárolás
+
+A felhasználók által feltöltött képfájlok külön PersistentVolumeClaim segítségével kerülnek tárolásra.
+
+Ez a kötet a Django alkalmazás Deployment-jében az alábbi útvonalra van csatolva: /app/media
+
+
+A Django `MEDIA_ROOT` beállítása ehhez az útvonalhoz igazodik.
+
+Ennek köszönhetően:
+
+- a feltöltött képek nem vesznek el pod újraindítás esetén  
+- az alkalmazás web rétege állapotmentessé válik  
+- a fájltárolás elkülönül az alkalmazás logikától  
+
+---
+
+### Többrétegű architektúra
+
+A rendszer a második beadás végére három fő rétegre bontható:
+
+**Web réteg**
+- Django alkalmazás
+- Gunicorn alkalmazásszerver
+- Kubernetes Deployment
+- Route alapú publikus elérés
+
+**Alkalmazás logika**
+- Django ORM
+- felhasználókezelés
+- képfeltöltési és jogosultságkezelési funkciók
+
+**Adat és tárolási réteg**
+- PostgreSQL külön Deployment objektumban
+- perzisztens adatbázis tárolás PVC segítségével
+- perzisztens média fájltárolás külön PVC-n
+
+Ez a felépítés megfelel egy klasszikus felhőalapú webalkalmazás rétegzett architektúrájának.
+
+---
+
+### Skálázhatóság és stabil működés
+
+Az alkalmazás Kubernetes Deployment segítségével skálázható, így több Django pod is indítható.  
+A Kubernetes Service biztosítja a terheléselosztást az alkalmazás példányai között.
+
+A perzisztens kötetek használatának köszönhetően:
+
+- a Django Deployment újraindítása nem okoz adatvesztést  
+- a PostgreSQL Deployment újraindítása után az adatbázis tartalma megmarad  
+- a feltöltött képfájlok perzisztensen tárolódnak  
+
+A rendszer így stabilan működik pod újraindítás és deployment frissítés esetén is.
+
+---
+
+### Összegzés
+
+A második beadás során az alkalmazás egy egyszerű konténerizált webalkalmazásból egy többrétegű, felhőalapú rendszer irányába fejlődött.
+
+Megvalósult:
+
+- külső PostgreSQL adatbázis használata  
+- perzisztens adatbázis tárolás  
+- perzisztens média fájltárolás  
+- stabil működés deployment újraindítás esetén  
+- skálázható alkalmazás architektúra  
 
 <br>
 
