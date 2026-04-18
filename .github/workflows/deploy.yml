@@ -40,6 +40,11 @@ jobs:
             --follow \
             --namespace=django-iac
 
+      - name: Trigger rollout with new image
+        run: |
+          oc rollout restart deployment/felhoalapu-elosztott-rendszerek-laboratorium \
+            -n django-iac
+
       - name: Rollout new Django deployment
         run: |
           oc rollout status deployment/felhoalapu-elosztott-rendszerek-laboratorium \
