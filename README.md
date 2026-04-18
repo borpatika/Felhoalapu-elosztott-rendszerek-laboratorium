@@ -390,3 +390,90 @@ A feladat célja a fényképalbum alkalmazásszerverének automatikus skálázó
 - **Terheléspróba PaaS-on**: a Locust webes UI lehetővé tette a teszt konfigurálását felhőből.
 
 ---
+
+<br>
+
+# 4. beadás - Infrastructure-as-Code
+
+### Használt eszköz
+
+**Kustomize** – az OKD/Kubernetes beépített IaC eszköze. Nem igényel külön telepítést, az `oc` CLI-vel natívan támogatott. A telepítés egyetlen paranccsal elvégezhető:
+
+```bash
+oc apply -k k8s/
+```
+
+A `k8s/kustomization.yaml` összefogó fájl felsorolja az összes erőforrást, és automatikusan rárakja a `django-iac` namespace-t minden erőforrásra.
+
+---
+
+### Konfigurált komponensek
+
+#### `imagestream.yaml`
+Az OKD belső image registry-ben létrehoz egy tárolót (`ImageStream`) a Django alkalmazás Docker image-e számára. A BuildConfig ide tolja a kész image-et, a Deployment innen húzza le.
+
+#### `buildconfig.yaml`
+Megmondja az OKD-nek, hogyan kell az alkalmazást buildelni: a GitHub repóból letölti a forráskódot, és a `Dockerfile` alapján elkészíti a Docker image-et, majd az ImageStream-be tölti.
+
+#### `postgres-pvc.yaml`
+1 GiB perzisztens tároló (`PersistentVolumeClaim`) az adatbázis adatainak. `oc apply` nem törli, csak létrehozza ha még nem létezik – ez garantálja, hogy redeploy után az adatok megmaradnak.
+
+#### `media-pvc.yaml`
+1 GiB perzisztens tároló a felhasználók által feltöltött képeknek (`ReadWriteMany` módban, hogy több replika is elérhesse). Redeploy után a képek nem vesznek el.
+
+#### `postgres-deployment.yaml`
+A PostgreSQL adatbázis-szerver deployment konfigurációja. A `Recreate` stratégiát használja (egyszerre csak egy példány futhat), és a `postgres-pvc` kötethez csatlakozik.
+
+#### `postgres-service.yaml`
+Belső hálózati szolgáltatás, amely a `postgres:5432` címen teszi elérhetővé az adatbázist a klaszteren belül. A Django alkalmazás ezen keresztül csatlakozik.
+
+#### `django-deployment.yaml`
+A Django/Gunicorn alkalmazásszerver deployment konfigurációja. Az OKD belső registry-ből húzza le a buildelés eredményeként létrejött image-et, és a `media-pvc` kötetet `/app/media` alá csatolja. Erőforráskorlátok: 500m CPU, 1Gi memória.
+
+#### `django-service.yaml`
+Belső hálózati szolgáltatás a Django alkalmazáshoz a 8080-as porton.
+
+#### `django-route.yaml`
+Publikusan elérhető HTTPS végpontot hoz létre az alkalmazáshoz (`edge` TLS terminálással), amely a `django-service`-re irányítja a forgalmat.
+
+---
+
+### GitHub Actions workflow
+
+A `.github/workflows/deploy.yml` fájl minden `main` ágra történő push esetén automatikusan lefuttatja a teljes deploy folyamatot.
+
+**A lépések sorrendben:**
+
+1. **Checkout** – letölti a repó aktuális állapotát
+2. **oc CLI telepítése** – az `openshift-tools-installer` action telepíti az OpenShift parancssori eszközt
+3. **Bejelentkezés az OKD-be** – a GitHub Secrets-ben tárolt szerver URL és token alapján (`OKD_SERVER`, `OKD_TOKEN`)
+4. **IaC alkalmazása** – `oc apply -k k8s/` létrehozza vagy frissíti az összes erőforrást (PVC-ket nem törli)
+5. **Postgres várakozás** – megvárja, hogy az adatbázis teljesen elinduljon, mielőtt a build elkezdődne
+6. **Docker image build** – `oc start-build` elindítja az OKD-n a buildet a Dockerfile alapján, és megvárja a befejezést
+7. **Rollout restart** – kényszeríti a Django deployment-et, hogy az új image-et töltse le
+8. **Rollout várakozás** – megvárja, hogy az új pod teljesen elinduljon és healthy legyen
+
+```
+git push
+    │
+    v
+oc apply -k k8s/        -> infrastruktúra létrehozása/frissítése
+    │
+    v
+postgres ready?         -> megvárja az adatbázist
+    │
+    v
+oc start-build          -> Dockerfile -> Docker image -> OKD registry
+    │
+    v
+oc rollout restart      -> új pod indul az új image-gel
+    │
+    v
+oc rollout status       -> sikeres deploy megerősítése
+```
+
+---
+
+### Folyamatos frissíthetőség
+
+Az `oc apply` parancs - szemben az `oc create`-tel - mindig csak frissíti a meglévő erőforrásokat, nem törli és hozza újra létre azokat. A `PersistentVolumeClaim` erőforrások különösen védve vannak: még ha a YAML-ból törölnénk is, az `oc apply` nem törli az adatokat tartalmazó köteteket. Ez garantálja, hogy az adatbázis tartalma és a feltöltött képek minden deploy után megmaradnak.
