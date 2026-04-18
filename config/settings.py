@@ -27,9 +27,10 @@ SECRET_KEY = 'django-insecure-tz!tp&@=gs+!(omi0q+)8_7t35n-6n-qu0jxp3=f$y54+03r_-
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "felhoalapu-elosztott-rendszerek-laboratorium-django.apps.okd.fured.cloud.bme.hu",
+    'localhost',
+    '127.0.0.1',
+    'felhoalapu-elosztott-rendszerek-laboratorium-django.apps.okd.fured.cloud.bme.hu',
+    'felhoalapu-elosztott-rendszerek-laboratorium-django-iac.apps.okd.fured.cloud.bme.hu'
 ]
 
 
@@ -138,4 +139,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 CSRF_TRUSTED_ORIGINS = [
     'https://felhoalapu-elosztott-rendszerek-laboratorium-django.apps.okd.fured.cloud.bme.hu',
+    'https://felhoalapu-elosztott-rendszerek-laboratorium-django-iac.apps.okd.fured.cloud.bme.hu'
 ]
