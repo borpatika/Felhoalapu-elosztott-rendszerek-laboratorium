@@ -379,6 +379,7 @@ A feladat célja a fényképalbum alkalmazásszerverének automatikus skálázó
 - Terhelés előtt 1 pod fut: ![alt text](image-1.png)
 - Terhelés elindítása: ![alt text](image-2.png)
 - Terhelés közben 4 pod fut: ![alt text](image-3.png)
+- diagram a terhelésről: ![alt text](image-5.png)
 - Terhelés leállta után visszaáll 1 pod-ra: ![alt text](image-4.png)
 ---
 
