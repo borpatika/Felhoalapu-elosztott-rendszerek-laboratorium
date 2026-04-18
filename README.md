@@ -379,7 +379,8 @@ A feladat célja a fényképalbum alkalmazásszerverének automatikus skálázó
 - Terhelés előtt 1 pod fut: ![alt text](image-1.png)
 - Terhelés elindítása: ![alt text](image-2.png)
 - Terhelés közben 4 pod fut: ![alt text](image-3.png)
-- diagram a terhelésről: ![alt text](image-5.png)
+- diagramok a terhelésről: ![alt text](image-5.png)
+![alt text](image-6.png)
 - Terhelés leállta után visszaáll 1 pod-ra: ![alt text](image-4.png)
 ---
 
@@ -476,4 +477,4 @@ oc rollout status       -> sikeres deploy megerősítése
 
 ### Folyamatos frissíthetőség
 
-Az `oc apply` parancs - szemben az `oc create`-tel - mindig csak frissíti a meglévő erőforrásokat, nem törli és hozza újra létre azokat. A `PersistentVolumeClaim` erőforrások különösen védve vannak: még ha a YAML-ból törölnénk is, az `oc apply` nem törli az adatokat tartalmazó köteteket. Ez garantálja, hogy az adatbázis tartalma és a feltöltött képek minden deploy után megmaradnak.
+Az `oc apply` parancs - szemben az `oc create`-tel  mindig csak frissíti a meglévő erőforrásokat, nem törli és hozza újra létre azokat. A `PersistentVolumeClaim` erőforrások különösen védve vannak: még ha a YAML-ból törölnénk is, az `oc apply` nem törli az adatokat tartalmazó köteteket. Ez garantálja, hogy az adatbázis tartalma és a feltöltött képek minden deploy után megmaradnak.
