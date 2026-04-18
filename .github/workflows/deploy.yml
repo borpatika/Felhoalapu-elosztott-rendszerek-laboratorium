@@ -1,0 +1,47 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install oc CLI
+        uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: latest
+
+      - name: Login to OpenShift
+        run: |
+          oc login ${{ secrets.OKD_SERVER }} \
+            --token=${{ secrets.OKD_TOKEN }} \
+            --insecure-skip-tls-verify=true
+
+      - name: Apply IaC manifests with Kustomize
+        run: |
+          oc apply -k k8s/
+
+      - name: Wait for Postgres to be ready
+        run: |
+          oc rollout status deployment/postgres \
+            -n django-iac \
+            --timeout=120s
+
+      - name: Build Docker image on OKD
+        run: |
+          oc start-build felhoalapu-elosztott-rendszerek-laboratorium \
+            --follow \
+            --namespace=django-iac
+
+      - name: Rollout new Django deployment
+        run: |
+          oc rollout status deployment/felhoalapu-elosztott-rendszerek-laboratorium \
+            -n django-iac \
+            --timeout=180s

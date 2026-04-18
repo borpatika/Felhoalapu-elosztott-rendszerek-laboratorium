@@ -1,0 +1,15 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: felhoalapu-elosztott-rendszerek-laboratorium
+  namespace: django-iac
+spec:
+  to:
+    kind: Service
+    name: felhoalapu-elosztott-rendszerek-laboratorium
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

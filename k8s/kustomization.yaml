@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: django-iac
+
+resources:
+  - imagestream.yaml
+  - buildconfig.yaml
+  - postgres-pvc.yaml
+  - media-pvc.yaml
+  - postgres-deployment.yaml
+  - postgres-service.yaml
+  - django-deployment.yaml
+  - django-service.yaml
+  - django-route.yaml

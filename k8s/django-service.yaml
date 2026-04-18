@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: felhoalapu-elosztott-rendszerek-laboratorium
+  namespace: django-iac
+spec:
+  selector:
+    app: felhoalapu-elosztott-rendszerek-laboratorium
+    deployment: felhoalapu-elosztott-rendszerek-laboratorium
+  ports:
+    - name: 8080-tcp
+      port: 8080
+      targetPort: 8080
